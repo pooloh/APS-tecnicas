@@ -1,0 +1,169 @@
+
+//APS - Técnicas de Programação
+//Nome: Nícolas Ribeiro Miranda; Turno: NOTURNO;
+//Orientador: Giovanne Barcelos
+//Tema escolhido: Agenda. (Estava tendo problemas com esse tema, até que o professor fez ele em aula, aí sim consegui fazer tudo certo.)
+/*
+Sistema de gerenciamento de contatos
+Neste projeto C, os usuários podem salvar o contato e também editar e excluí-lo.
+É como um aplicativo de lista telefônica. O manuseio de arquivos é usado para armazenar os dados.
+Ele também usa estrutura de dados para salvar os contatos etc.
+*/
+
+#include <stdio.h>
+
+typedef struct {
+    int listNumber;
+    char nome[80];
+    char telefone[60];
+    char desc[100];
+    char email[50];
+    char genero[20];
+} Agenda;
+
+int menu();
+void criarContato(FILE *listaTelefonica);
+void listarContatos(FILE *listaTelefonica);
+void excluirContato(FILE *listaTelefonica);
+void informacoesContato(FILE *listaTelefonica);
+Agenda buscarContato(FILE *listaTelefonica, int codigo);
+
+int main(int argc, char const *argv[]) {
+    FILE *listaTelefonica;
+    
+    listaTelefonica = fopen("listaTelefonica.dat", "a+");
+
+    if (listaTelefonica == NULL) {
+        printf("Arquivo não pode ser aberto\n");
+        return -1;
+    }
+    
+    int opcao; 
+    
+    while(opcao != 6) {
+        rewind(listaTelefonica);
+        menu();
+
+        scanf("%d", &opcao);
+
+        switch(opcao) {
+            case 1:
+               criarContato(listaTelefonica);
+            break;
+            case 2:
+                //excluirContato(listaTelefonica);
+            break;
+            case 3:
+                //editarContato(listaTelefonica);
+            break;
+            case 4:
+                listarContatos(listaTelefonica);
+            break;
+            case 5:
+                informacoesContato(listaTelefonica);
+            break;
+            case 6:
+                printf("Programa finalizado\n");
+                return 0;
+            break;
+            default:
+                printf("Por favor, selecione uma opcao valida.");
+            break;
+        }
+    }
+    
+    return 0;
+}
+
+int menu() {
+    //int opcao;
+    printf(">>>>GERENCIADOR DE CONTATOS<<<<\n\n");
+    printf("(1) Adicionar contato\n");
+    printf("(2) Excluir contato\n");
+    printf("(3) Editar contato\n");
+    printf("(4) Todos os contatos\n");
+    printf("(5) Buscar contato especifico\n");
+    printf("(6) Sair\n");
+    printf("\nESCOLHA UMA OPCAO: ");
+    //scanf("&d", &opcao);
+    return 0;
+}
+
+void criarContato(FILE *listaTelefonica) {
+    Agenda contato;
+
+    printf("VOCE ESCOLHEU: ADCIONAR CONTATO\n");
+    printf("\nDIGITE O CODIGO DO CONTATO: ");
+    scanf("%d", &contato.listNumber);
+    printf("\nDIGITE O NOME DO CONTATO: ");
+    scanf("%s", contato.nome);
+    printf("\nDIGITE O GENERO DO CONTATO: ");
+    scanf("%s", contato.genero);
+    printf("\nDIGITE O TELEFONE DO CONTATO: ");
+    scanf("%s", contato.telefone);
+    printf("\nDIGITE O E-MAIL DO CONTATO: ");
+    scanf("%s", contato.email);
+    printf("\nDIGITE UMA DESCRICAO PARA O CONTATO: ");
+    scanf("%s", contato.desc);
+
+    fprintf(listaTelefonica, "%d %s %s %s %s %s\n", contato.listNumber, contato.nome, contato.genero, contato.telefone, contato.email, contato.desc);
+    //fprintf(listaTelefonica, "%d %s %s %s\n", contato.listNumber, contato.nome, contato.telefone, contato.desc); BACKUP
+    printf("\nContato adicionado com sucesso.\n\n");
+
+    /*printf("\n\nREVISAR CONTATO\n\n");
+    printf("\nCODIGO: %d", contato.listNumber);
+    printf("\nNOME: %s", contato.nome);
+    printf("\nTELEFONE: %s", contato.telefone);
+    printf("\nDESCRICAO: %s\n", contato.desc);*/
+
+    
+}
+
+void listarContatos(FILE *listaTelefonica) {
+    printf("\n\nCONTATOS:\n\n");
+
+    //printf("\n%6s %30s %15s %10s %50s %20s\n", "Codigo", "Nome", "Genero", "Telefone", "E-mail", "Descricao");
+    printf("\n%6s %30s %10s %20s\n", "Codigo", "Nome", "Telefone", "Descricao");
+
+    Agenda contato;
+    while (!feof(listaTelefonica)) {
+        fscanf(listaTelefonica, "%d %s %s %s %s %s", &contato.listNumber, contato.nome, contato.genero, contato.telefone, contato.email, contato.desc);
+        printf("%6d %40s %15s %10s %50s %20s\n", contato.listNumber, contato.nome, contato.genero, contato.telefone, contato.email, contato.desc);
+        //fscanf(listaTelefonica, "%d %s %s %s", &contato.listNumber, contato.nome, contato.telefone, contato.desc);
+        //printf("%6d %40s %15s %10s %50s %20s\n", contato.listNumber, contato.nome, contato.telefone, contato.desc);
+    }
+}
+
+void informacoesContato(FILE *listaTelefonica) {
+    int codigo;
+
+    Agenda contato = buscarContato(listaTelefonica, codigo);
+ 
+    printf("\n\nINFORMACOES DE CONTATO: \n\n");
+    printf("CODIGO DO CONTATO: ");
+    scanf("%d", &codigo);
+    
+    if (codigo == contato.listNumber) {
+        printf("\nCONTATO REFERENTE AO CODIGO: >> %d <<\n------------------\n", contato.listNumber);
+        printf("\nNOME: %s", contato.nome);
+        printf("\nGENERO: %s", contato.genero);
+        printf("\nNUMERO DE TELEFONE: %s", contato.telefone);
+        printf("\nE-MAIL: %s", contato.email);
+        printf("\nDESCRICAO DO CONTATO: %s", contato.desc);
+        printf("\n");
+    }
+
+    else {
+        printf("\nContato nao localizado.\n");
+    }
+}
+
+Agenda buscarContato(FILE *listaTelefonica, int codigo) {
+    Agenda contato;
+
+    while (!feof(listaTelefonica) && contato.listNumber != codigo) {
+        fscanf(listaTelefonica, "%d %s %s %s %s %s", &contato.listNumber, contato.nome, contato.genero, contato.telefone, contato.email, contato.desc);
+        //fscanf(listaTelefonica, "%d %s %s %s", &contato.listNumber, contato.nome, contato.telefone, contato.desc);
+  }
+  return contato;
+}
